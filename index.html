@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Nomad Data Adventure · Offline sample</title>
+  <style>
+    :root { color-scheme: light; --paper:#f5f1ea; --paper-2:#ede8de; --ink:#1c1b19; --ink-2:#4a4844; --ink-3:#76736c; --line:#d8d2c7; --teal:#0d5c5c; --teal-bg:#e0ecec; --ochre:#b8732e; --ochre-bg:#f4e8d8; --shadow:0 1px 3px rgba(28,27,25,.06); }
+    * { box-sizing:border-box; }
+    body { margin:0; background:var(--paper); color:var(--ink); font:15px/1.5 ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; }
+    .shell { width:min(1100px,calc(100% - 40px)); margin:auto; padding:28px 0 64px; }
+    .badge { display:inline-block; border:1px solid #c8dadb; border-radius:999px; padding:5px 10px; color:var(--teal); background:var(--teal-bg); font-size:11px; font-weight:800; letter-spacing:.07em; text-transform:uppercase; }
+    header { max-width:720px; padding:42px 0 28px; }
+    .eyebrow { margin:0; color:var(--teal); font-size:11px; font-weight:800; letter-spacing:.08em; text-transform:uppercase; }
+    h1,h2 { font-family:Georgia,"Times New Roman",serif; letter-spacing:-.035em; }
+    h1 { margin:7px 0 12px; font-size:clamp(2.35rem,6vw,4rem); line-height:1.04; }
+    .lede { max-width:60ch; margin:0; color:var(--ink-2); font-size:16px; }
+    .controls { display:flex; flex-wrap:wrap; align-items:end; gap:16px; margin:10px 0 24px; padding:16px; border:1px solid var(--line); border-radius:7px; background:#fff; box-shadow:var(--shadow); }
+    label { display:grid; gap:5px; color:var(--ink-3); font-size:11px; font-weight:800; letter-spacing:.06em; text-transform:uppercase; }
+    select,input { min-height:38px; border:1px solid var(--line); border-radius:5px; padding:7px 10px; background:#fff; color:var(--ink); font:inherit; }
+    input[type=range] { width:min(240px,55vw); padding:0; accent-color:var(--teal); }
+    .budget-value { color:var(--teal); font:700 18px Georgia,"Times New Roman",serif; text-transform:none; letter-spacing:0; }
+    .count { margin-left:auto; color:var(--ink-3); font-size:12px; }
+    .cards { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:16px; }
+    .card { display:flex; min-height:258px; flex-direction:column; padding:20px; border:1px solid var(--line); border-radius:7px; background:#fff; box-shadow:var(--shadow); }
+    .card-top { display:flex; justify-content:space-between; gap:10px; align-items:start; }
+    .region { margin:0; color:var(--teal); font-size:11px; font-weight:800; letter-spacing:.07em; text-transform:uppercase; }
+    h2 { margin:5px 0 0; font-size:25px; line-height:1.1; }
+    .score { display:grid; width:42px; height:42px; place-items:center; flex:none; border-radius:50%; color:var(--teal); background:var(--teal-bg); font:700 17px Georgia,"Times New Roman",serif; }
+    .note { min-height:48px; margin:18px 0; color:var(--ink-2); font-size:13px; }
+    dl { display:grid; gap:9px; margin:auto 0 0; }
+    dl div { display:flex; justify-content:space-between; gap:10px; padding-top:9px; border-top:1px solid var(--line); }
+    dt { color:var(--ink-3); font-size:12px; } dd { margin:0; font-weight:800; font-variant-numeric:tabular-nums; }
+    .empty { padding:24px; border:1px dashed var(--line); color:var(--ink-2); background:var(--paper-2); }
+    .summary { display:grid; grid-template-columns:repeat(3,1fr); gap:1px; margin-top:20px; overflow:hidden; border:1px solid var(--line); border-radius:7px; background:var(--line); }
+    .summary div { display:grid; gap:3px; padding:16px 18px; background:var(--paper-2); }
+    .summary span,.summary small { color:var(--ink-3); font-size:11px; } .summary strong { font:600 18px Georgia,"Times New Roman",serif; }
+    footer { max-width:720px; margin-top:20px; padding:14px 16px; border-left:3px solid var(--ochre); background:var(--ochre-bg); color:var(--ink-2); font-size:13px; }
+    footer strong { color:var(--ink); }
+    @media (max-width:720px) { .shell { width:min(100% - 28px,560px); padding-top:18px; } header { padding-top:28px; } .controls { align-items:stretch; flex-direction:column; } .count { margin-left:0; } .cards,.summary { grid-template-columns:1fr; } input[type=range] { width:100%; } }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <span class="badge">Offline sample · synthetic data</span>
+    <header>
+      <p class="eyebrow">Nomad Data Adventure</p>
+      <h1>Compare a small city shortlist.</h1>
+      <p class="lede">A self-contained exploration demo with fictional records. Sort the trade-offs or set a monthly budget; no collected dataset or network request is involved.</p>
+    </header>
+    <section class="controls" aria-label="Sample controls">
+      <label>Sort by
+        <select id="sort" aria-label="Sort cities">
+          <option value="score">Overall score</option>
+          <option value="cost">Lowest monthly estimate</option>
+          <option value="internet">Fastest internet</option>
+          <option value="safety">Highest safety</option>
+        </select>
+      </label>
+      <label>Maximum monthly estimate <span class="budget-value" id="budgetValue">$2,500</span>
+        <input id="budget" type="range" min="1200" max="2500" step="50" value="2500" aria-label="Maximum monthly estimate">
+      </label>
+      <span class="count" id="count" aria-live="polite"></span>
+    </section>
+    <section id="cards" class="cards" aria-label="Sample city comparison"></section>
+    <section id="summary" class="summary" aria-label="Sample highlights"></section>
+    <footer><strong>Data note.</strong> Every city and value on this page is fictional and authored for this demo. It is not a claim about a real place and carries no third-party redistribution rights.</footer>
+  </main>
+  <script>
+    const cities = [
+      { name:'Aster Bay', country:'Luma', region:'Coast', cost:1450, internet:82, safety:4.6, score:4.4, note:'Fast connection and the lowest monthly estimate.' },
+      { name:'Juniper Ridge', country:'Northstar', region:'Highlands', cost:1820, internet:64, safety:4.9, score:4.5, note:'The strongest safety score in the sample.' },
+      { name:'Solport', country:'Maris', region:'Harbor', cost:2160, internet:96, safety:4.1, score:4.3, note:'The fastest connection for a higher monthly estimate.' }
+    ];
+    const cards = document.querySelector('#cards');
+    const summary = document.querySelector('#summary');
+    const sort = document.querySelector('#sort');
+    const budget = document.querySelector('#budget');
+    const budgetValue = document.querySelector('#budgetValue');
+    const count = document.querySelector('#count');
+    const money = value => `$${value.toLocaleString()}`;
+    function render() {
+      const max = Number(budget.value);
+      const key = sort.value;
+      const direction = key === 'cost' ? 1 : -1;
+      const visible = cities.filter(city => city.cost <= max).sort((a,b) => (a[key] - b[key]) * direction);
+      budgetValue.textContent = money(max);
+      count.textContent = `${visible.length} of ${cities.length} cities shown`;
+      cards.innerHTML = visible.length ? visible.map(city => `<article class="card"><div class="card-top"><div><p class="region">${city.region} · ${city.country}</p><h2>${city.name}</h2></div><span class="score">${city.score.toFixed(1)}</span></div><p class="note">${city.note}</p><dl><div><dt>Monthly estimate</dt><dd>${money(city.cost)}</dd></div><div><dt>Internet</dt><dd>${city.internet} Mbps</dd></div><div><dt>Safety</dt><dd>${city.safety.toFixed(1)} / 5</dd></div></dl></article>`).join('') : '<p class="empty">No fictional city fits this budget. Increase the maximum to see the sample again.</p>';
+      const highlights = visible.length ? [{ label:'Lowest estimate', city:visible.reduce((a,b) => a.cost < b.cost ? a : b), value:city => `${money(city.cost)} / month` }, { label:'Fastest internet', city:visible.reduce((a,b) => a.internet > b.internet ? a : b), value:city => `${city.internet} Mbps` }, { label:'Highest safety', city:visible.reduce((a,b) => a.safety > b.safety ? a : b), value:city => `${city.safety.toFixed(1)} / 5` }] : [];
+      summary.innerHTML = highlights.map(item => `<div><span>${item.label}</span><strong>${item.city.name}</strong><small>${item.value(item.city)}</small></div>`).join('');
+    }
+    sort.addEventListener('change', render); budget.addEventListener('input', render); render();
+  </script>
+</body>
+</html>
