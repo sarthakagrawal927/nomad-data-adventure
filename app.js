@@ -13,8 +13,10 @@ const numericKeys=['budget','internet','safety','walkability','healthcare','engl
 for(const k of numericKeys) if(filters[k]!=='' && !Number.isFinite(Number(filters[k]))) filters[k]='';
 const tints={'Asia':'#e8eedc','Europe':'#e8ede4','North America':'#edece1','Latin America':'#f2eadb','Africa':'#f0e9dc','Middle East':'#f0e5dc','Oceania':'#e3eeeb'};
 function sourceURL(city){try{const u=new URL(city.url);return u.protocol==='https:'&&u.hostname==='nomads.com'?u.href:'https://nomads.com/';}catch{return 'https://nomads.com/';}}
+function updateBudgetLabel(){const slider=$('#budget');const value=Number(slider.value);const label=value>=Number(slider.max)?'Any budget':format(value,'money');$('#budget-value').textContent=label;slider.setAttribute('aria-valuetext',label);}
 function syncForm(){
- for(const [key,value] of Object.entries(filters)){const input=form.elements.namedItem(key);if(input){if(input.type==='checkbox')input.checked=value;else input.value=value;}}
+ for(const [key,value] of Object.entries(filters)){const input=form.elements.namedItem(key);if(input){if(input.type==='checkbox')input.checked=value;else input.value=key==='budget'&&value===''?input.max:value;}}
+ updateBudgetLabel();
  $('#search').value=filters.q;$('#sort').value=filters.sort;
  document.querySelectorAll('[data-view]').forEach(el=>el.setAttribute('aria-pressed',el.dataset.view===filters.view));
  document.querySelectorAll('[data-preset]').forEach(el=>el.setAttribute('aria-pressed',el.dataset.preset===preset));
@@ -55,7 +57,7 @@ function showDetails(slug){const c=cities.find(c=>c.slug===slug);if(!c)return;
 function showComparison(){const rows=[...selected].map(slug=>cities.find(c=>c.slug===slug)).filter(Boolean);if(rows.length<2)return;
  $('#comparison-content').innerHTML=`<div class="table-wrap"><table class="compare-table"><thead><tr><th>THE DETAILS</th>${rows.map(c=>`<th class="city-column">${escape(c.name)}<small>${escape(c.country)}</small></th>`).join('')}</tr></thead><tbody>${metrics.map(([key,label,type])=>`<tr><th scope="row">${label}</th>${rows.map(c=>`<td>${format(c[key],type)}${type==='money'&&(key.startsWith('cost_for_')?anomaly(c[key]):known(c[key])&&c[key]>30000)?'<small>Unusual source estimate</small>':''}</td>`).join('')}</tr>`).join('')}<tr><th>Source</th>${rows.map(c=>`<td><a href="${escape(sourceURL(c))}" target="_blank" rel="noopener">Nomads.com ↗</a></td>`).join('')}</tr></tbody></table></div>`;$('#compare-dialog').showModal();}
 function download(type){const body=type==='json'?JSON.stringify({source:'https://nomads.com/',count:filtered.length,filters,cities:filtered},null,2):toCSV(filtered);const url=URL.createObjectURL(new Blob([body],{type:type==='json'?'application/json':'text/csv;charset=utf-8'}));const a=document.createElement('a');a.href=url;a.download=`nomad-atlas-${filtered.length}-cities.${type}`;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);toast(`Downloaded ${filtered.length.toLocaleString()} cities as ${type.toUpperCase()}`);}
-form.addEventListener('submit',e=>e.preventDefault());form.addEventListener('input',e=>{const el=e.target;if(!Object.hasOwn(filters,el.name))return;filters[el.name]=el.type==='checkbox'?el.checked:el.value;preset='';apply();});
+form.addEventListener('submit',e=>e.preventDefault());form.addEventListener('input',e=>{const el=e.target;if(!Object.hasOwn(filters,el.name))return;filters[el.name]=el.type==='checkbox'?el.checked:el.name==='budget'&&Number(el.value)>=Number(el.max)?'':el.value;preset='';apply();});
 $('#search').addEventListener('input',e=>{filters.q=e.target.value;preset='';document.querySelectorAll('[data-preset]').forEach(el=>el.setAttribute('aria-pressed','false'));limit=24;render();});
 $('#sort').addEventListener('change',e=>{filters.sort=e.target.value;limit=24;render();});$('#reset').addEventListener('click',reset);
 $('#more').addEventListener('click',()=>{const oldCount=Math.min(limit,filtered.length);limit+=24;render();const next=$('#results').querySelectorAll(filters.view==='cards'?'.card-title':'tbody .text-button')[filters.view==='cards'?oldCount:oldCount*2];next?.focus({preventScroll:true});});

@@ -25,6 +25,10 @@ test('missing measurements are never treated as zero, and zero remains valid',()
  assert.equal(format(null,'money'),'Not available');assert.equal(format(0,'money'),'$0');
  assert.equal(median([null,10,20]),15);assert.equal(median([]),null);
 });
+test('the slider endpoint means no monthly-cost cap',()=>{
+ assert.equal(selectCities(cities,{budget:'15000'}).length,1374);
+ assert.ok(selectCities(cities,{budget:'1500'}).every(c=>c.cost_for_nomad_usd_per_month<=1500));
+});
 test('CSV quotes values and prevents formula injection while preserving numbers',()=>{
  const csv=toCSV([{name:'=1+1',note:'City, "quoted"',temperature:-5,missing:null}]);
  assert.ok(csv.includes('"\'=1+1"'));assert.ok(csv.includes('"City, ""quoted"""'));assert.ok(csv.includes('"-5"'));assert.ok(csv.endsWith('""'));

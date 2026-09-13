@@ -48,7 +48,7 @@ export function selectCities(cities, filters) {
     if (f.country && c.country!==f.country) return false;
     if (f.visa && c.has_remote_work_visa!==true) return false;
     for (const [k,field] of Object.entries(minimums)) if (f[k]!=='' && (!known(c[field]) || c[field]<Number(f[k]))) return false;
-    for (const [k,field] of Object.entries(maximums)) if (f[k]!=='' && (!known(c[field]) || c[field]>Number(f[k]))) return false;
+    for (const [k,field] of Object.entries(maximums)) if (f[k]!=='' && !(k==='budget'&&Number(f[k])>=15000) && (!known(c[field]) || c[field]>Number(f[k]))) return false;
     return true;
   });
   const key=f.sort==='cost' ? costKey(f.profile) : f.sort;
