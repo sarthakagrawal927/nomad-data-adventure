@@ -1,156 +1,57 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Nomad Data Adventure · City explorer</title>
-  <style>
-    :root { color-scheme: light; --paper:#f5f1ea; --paper-2:#ede8de; --ink:#1c1b19; --ink-2:#4a4844; --ink-3:#76736c; --line:#d8d2c7; --teal:#0d5c5c; --teal-bg:#e0ecec; --ochre:#b8732e; --ochre-bg:#f4e8d8; --shadow:0 1px 3px rgba(28,27,25,.06); }
-    * { box-sizing:border-box; }
-    body { margin:0; background:var(--paper); color:var(--ink); font:15px/1.5 ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; }
-    .shell { width:min(1100px,calc(100% - 40px)); margin:auto; padding:28px 0 64px; }
-    .badge { display:inline-block; border:1px solid #c8dadb; border-radius:999px; padding:5px 10px; color:var(--teal); background:var(--teal-bg); font-size:11px; font-weight:800; letter-spacing:.07em; text-transform:uppercase; }
-    header { max-width:720px; padding:42px 0 28px; }
-    .eyebrow { margin:0; color:var(--teal); font-size:11px; font-weight:800; letter-spacing:.08em; text-transform:uppercase; }
-    h1,h2 { font-family:Georgia,"Times New Roman",serif; letter-spacing:-.035em; }
-    h1 { margin:7px 0 12px; font-size:clamp(2.35rem,6vw,4rem); line-height:1.04; }
-    .lede { max-width:60ch; margin:0; color:var(--ink-2); font-size:16px; }
-    .controls { display:flex; flex-wrap:wrap; align-items:end; gap:16px; margin:10px 0 24px; padding:16px; border:1px solid var(--line); border-radius:7px; background:#fff; box-shadow:var(--shadow); }
-    label { display:grid; gap:5px; color:var(--ink-3); font-size:11px; font-weight:800; letter-spacing:.06em; text-transform:uppercase; }
-    button { cursor:pointer; min-height:40px; padding:9px 16px; border:1px solid var(--teal); border-radius:5px; background:var(--teal); color:white; font:inherit; }
-    a { color:var(--teal); }
-    #more { margin-top:20px; }
-    select,input { min-height:38px; border:1px solid var(--line); border-radius:5px; padding:7px 10px; background:#fff; color:var(--ink); font:inherit; }
-    input[type=range] { width:min(240px,55vw); padding:0; accent-color:var(--teal); }
-    .budget-value { color:var(--teal); font:700 18px Georgia,"Times New Roman",serif; text-transform:none; letter-spacing:0; }
-    .count { margin-left:auto; color:var(--ink-3); font-size:12px; }
-    .cards { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:16px; }
-    .card { display:flex; min-height:258px; flex-direction:column; padding:20px; border:1px solid var(--line); border-radius:7px; background:#fff; box-shadow:var(--shadow); }
-    .card-top { display:flex; justify-content:space-between; gap:10px; align-items:start; }
-    .region { margin:0; color:var(--teal); font-size:11px; font-weight:800; letter-spacing:.07em; text-transform:uppercase; }
-    h2 { margin:5px 0 0; font-size:25px; line-height:1.1; }
-    .score { display:grid; width:42px; height:42px; place-items:center; flex:none; border-radius:50%; color:var(--teal); background:var(--teal-bg); font:700 17px Georgia,"Times New Roman",serif; }
-    .note { min-height:48px; margin:18px 0; color:var(--ink-2); font-size:13px; }
-    dl { display:grid; gap:9px; margin:auto 0 0; }
-    dl div { display:flex; justify-content:space-between; gap:10px; padding-top:9px; border-top:1px solid var(--line); }
-    dt { color:var(--ink-3); font-size:12px; } dd { margin:0; font-weight:800; font-variant-numeric:tabular-nums; }
-    .empty { padding:24px; border:1px dashed var(--line); color:var(--ink-2); background:var(--paper-2); }
-    .summary { display:grid; grid-template-columns:repeat(3,1fr); gap:1px; margin-top:20px; overflow:hidden; border:1px solid var(--line); border-radius:7px; background:var(--line); }
-    .summary div { display:grid; gap:3px; padding:16px 18px; background:var(--paper-2); }
-    .summary span,.summary small { color:var(--ink-3); font-size:11px; } .summary strong { font:600 18px Georgia,"Times New Roman",serif; }
-    footer { max-width:720px; margin-top:20px; padding:14px 16px; border-left:3px solid var(--ochre); background:var(--ochre-bg); color:var(--ink-2); font-size:13px; }
-    footer strong { color:var(--ink); }
-    @media (max-width:720px) { .shell { width:min(100% - 28px,560px); padding-top:18px; } header { padding-top:28px; } .controls { align-items:stretch; flex-direction:column; } .count { margin-left:0; } .cards,.summary { grid-template-columns:1fr; } input[type=range] { width:100%; } }
-  </style>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Nomad Atlas — Find your kind of somewhere</title>
+  <meta name="description" content="Explore 1,374 places through cost, connectivity, everyday life and more. Build a shortlist and compare your next place, with data from Nomads.com.">
+  <meta name="theme-color" content="#193c36">
+  <link rel="icon" type="image/svg+xml" href="./favicon.svg">
+  <link rel="stylesheet" href="./style.css">
+  <script type="module" src="./app.js"></script>
 </head>
 <body>
-  <main class="shell">
-    <span class="badge">City data · by Nomads.com</span>
-    <header>
-      <p class="eyebrow">Nomad Data Adventure</p>
-      <h1>Find your next city.</h1>
-      <p class="lede">Explore 1,383 cities by monthly cost, internet speed and safety. Search for a place, compare the trade-offs, or download the full dataset.</p>
-      <p><a href="https://nomads.com/">City data by Nomads.com</a> · <a href="./cities.json" download>Download JSON · 1.35 MB</a></p>
-    </header>
-    <section class="controls" aria-label="City filters">
-      <label>Search cities or countries
-        <input id="search" type="search" placeholder="City or country" aria-label="Search cities or countries">
-      </label>
-      <label>Sort by
-        <select id="sort" aria-label="Sort cities">
-          <option value="score">Overall score</option>
-          <option value="cost">Lowest monthly estimate</option>
-          <option value="internet">Fastest internet</option>
-          <option value="safety">Highest safety</option>
-        </select>
-      </label>
-      <label>Maximum monthly estimate <span class="budget-value" id="budgetValue">Any budget</span>
-        <input id="budget" type="range" min="0" max="15000" step="100" value="15000" aria-label="Maximum monthly estimate">
-      </label>
-      <span class="count" id="count" aria-live="polite"></span>
-    </section>
-    <section id="cards" class="cards" aria-label="City comparison" aria-busy="true"></section>
-    <section id="summary" class="summary" aria-label="City highlights"></section>
-    <button id="more" type="button" hidden>Show more cities</button>
-    <footer><strong>Data by <a href="https://nomads.com/">Nomads.com</a>.</strong> Credit to Nomads.com for the city data. This independent explorer uses a saved snapshot, not live prices or conditions. Missing values are shown as unavailable. <a href="./cities.json" download>Download the full JSON dataset</a>.</footer>
-  </main>
-  <script>
-    let cities = [];
-    let limit = 60;
-    const cards = document.querySelector('#cards');
-    const summary = document.querySelector('#summary');
-    const sort = document.querySelector('#sort');
-    const search = document.querySelector('#search');
-    const budget = document.querySelector('#budget');
-    const budgetValue = document.querySelector('#budgetValue');
-    const count = document.querySelector('#count');
-    const more = document.querySelector('#more');
-    const money = value => new Intl.NumberFormat('en-US', { style:'currency', currency:'USD', maximumFractionDigits:0 }).format(value);
-    const known = value => typeof value === 'number' && Number.isFinite(value);
-    const escape = value => String(value ?? '').replace(/[&<>"']/g, character => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' })[character]);
-    const metric = (value, unit) => known(value) ? `${value.toLocaleString('en-US', { maximumFractionDigits:1 })}${unit}` : 'Unavailable';
-    function render() {
-      const max = Number(budget.value);
-      const anyBudget = max === Number(budget.max);
-      const query = search.value.trim().toLowerCase();
-      const key = sort.value;
-      const direction = key === 'cost' ? 1 : -1;
-      const visible = cities.filter(city =>
-        (anyBudget || (known(city.cost) && city.cost <= max)) &&
-        `${city.name} ${city.country}`.toLowerCase().includes(query)
-      ).sort((a,b) => {
-        if (!known(a[key])) return known(b[key]) ? 1 : a.name.localeCompare(b.name);
-        if (!known(b[key])) return -1;
-        return (a[key] - b[key]) * direction || a.name.localeCompare(b.name);
-      });
-      const shown = visible.slice(0, limit);
-      budgetValue.textContent = anyBudget ? 'Any budget' : money(max);
-      count.textContent = `${shown.length.toLocaleString()} shown · ${visible.length.toLocaleString()} matching · ${cities.length.toLocaleString()} total`;
-      cards.innerHTML = shown.length ? shown.map(city => `<article class="card"><div class="card-top"><div><p class="region">${escape(city.region)} · ${escape(city.country)}</p><h2>${escape(city.name)}</h2></div><span class="score" title="Overall score out of 5">${known(city.score) ? city.score.toFixed(1) : '—'}</span></div><p class="note">${city.url ? `<a href="${escape(city.url)}">View on Nomads.com</a>` : 'Source: Nomads.com'}</p><dl><div><dt>Monthly estimate</dt><dd>${known(city.cost) ? money(city.cost) : 'Unavailable'}</dd></div><div><dt>Internet</dt><dd>${metric(city.internet, ' Mbps')}</dd></div><div><dt>Safety</dt><dd>${metric(city.safety, ' / 5')}</dd></div></dl></article>`).join('') : '<p class="empty">No cities match. Try another search or increase your budget.</p>';
-      const highlights = [
-        { label:'Lowest estimate', key:'cost', direction:1, value:city => `${money(city.cost)} / month` },
-        { label:'Fastest internet', key:'internet', direction:-1, value:city => metric(city.internet, ' Mbps') },
-        { label:'Highest safety', key:'safety', direction:-1, value:city => metric(city.safety, ' / 5') }
-      ].flatMap(item => {
-        const available = visible.filter(city => known(city[item.key]));
-        if (!available.length) return [];
-        const city = available.reduce((a,b) => (a[item.key] - b[item.key]) * item.direction <= 0 ? a : b);
-        return [{ ...item, city }];
-      });
-      summary.innerHTML = highlights.map(item => `<div><span>${item.label}</span><strong>${escape(item.city.name)}</strong><small>${item.value(item.city)}</small></div>`).join('');
-      more.hidden = shown.length >= visible.length;
-    }
-    function reset() { limit = 60; render(); }
-    sort.addEventListener('change', reset);
-    budget.addEventListener('input', reset);
-    search.addEventListener('input', reset);
-    more.addEventListener('click', () => { limit += 60; render(); });
-    async function loadCities() {
-      cards.innerHTML = '<p class="empty" role="status">Loading cities…</p>';
-      try {
-        const response = await fetch('./cities.json');
-        if (!response.ok) throw new Error(`Dataset request failed: ${response.status}`);
-        const data = await response.json();
-        if (!Array.isArray(data.cities) || !data.cities.length) throw new Error('Invalid city dataset');
-        cities = data.cities.map(city => {
-          let url = '';
-          try {
-            const source = new URL(city.url);
-            if (source.protocol === 'https:' && source.hostname === 'nomads.com') url = source.href;
-          } catch {}
-          return { name:String(city.name ?? ''), country:String(city.country ?? ''), region:String(city.region ?? ''), url,
-            cost:city.cost_for_nomad_usd_per_month, internet:city.internet_mbps,
-            safety:city.safety_score_0_to_5, score:city.overall_score };
-        });
-        render();
-      } catch {
-        cards.innerHTML = '<p class="empty" role="alert">The city dataset could not be loaded. Please refresh to retry, or <a href="./cities.json">open the JSON dataset</a>.</p>';
-        count.textContent = 'Dataset unavailable';
-      } finally {
-        cards.setAttribute('aria-busy', 'false');
-      }
-    }
-    loadCities();
-  </script>
-</body>
-</html>
+<a class="skip" href="#explore">Skip to cities</a>
+<header class="nav wrap">
+  <a class="brand" href="./" aria-label="Nomad Atlas home"><span class="brand-mark" aria-hidden="true">n<span>↗</span></span><span>nomad<span class="brand-light">atlas</span><small>BY NOMAD DATA ADVENTURE</small></span></a>
+  <nav aria-label="Main navigation"><a href="#explore" class="nav-active">Explore cities</a><button class="text-button" id="about">About the data ↗</button><a href="./cities.json" download class="download-top">Get the dataset <span>↓</span></a></nav>
+</header>
+<main>
+<section class="hero wrap" aria-labelledby="hero-title">
+  <div class="hero-copy"><p class="eyebrow"><span class="live-dot"></span> A FIELD GUIDE TO LIVING ELSEWHERE</p><h1 id="hero-title">Find your kind<br>of <em>somewhere.</em></h1><p class="hero-description">A new timezone. A different pace. A place that fits.<br>Explore the numbers behind your next chapter.</p><a class="hero-cta" href="#explore">Find a place to call home <span>↘</span></a><div class="hero-credit">City data from <a href="https://nomads.com/">Nomads.com ↗</a></div></div>
+  <div class="hero-art" aria-hidden="true"><div class="orbit orbit-a"></div><div class="orbit orbit-b"></div><div class="orbit orbit-c"></div><div class="globe"><div class="longitude a"></div><div class="longitude b"></div><div class="latitude a"></div><div class="latitude b"></div><div class="latitude c"></div></div><span class="coordinate co-one">EVERYDAY LIFE, ELSEWHERE</span><span class="coordinate co-two">NO SINGLE RIGHT ANSWER.</span><div class="postcard"><span class="postcard-label">YOUR NEXT CHAPTER</span><span class="postcard-title">Somewhere<br>that feels like you.</span><span class="postcard-bottom">A LITTLE CURIOSITY GOES A LONG WAY <b>↗</b></span></div><span class="art-star">✳</span></div>
+</section>
+<section class="stats wrap" aria-label="Dataset overview"><div><strong id="total-cities">1,374</strong><span>places to discover</span></div><div><strong id="total-countries">205</strong><span>countries & territories</span></div><div><strong>22</strong><span>ways to compare</span></div><p>A saved snapshot.<br><span>Your starting point for exploration.</span></p></section>
+<section id="explore" class="explore wrap">
+  <div class="explore-heading"><div><p class="eyebrow">THE WORLD, ON YOUR TERMS</p><h2>Where do you want to go?</h2></div><button id="mobile-filters" class="secondary">Refine your search <span>☷</span></button></div>
+  <div class="presets" aria-label="Quick filters"><button data-preset="all" aria-pressed="true">✳ &nbsp; All places</button><button data-preset="budget" aria-pressed="false">↘ &nbsp; Under $1,500</button><button data-preset="connected" aria-pressed="false">↗ &nbsp; Well connected</button><button data-preset="walkable" aria-pressed="false">⌁ &nbsp; Walkable living</button><button data-preset="visa" aria-pressed="false">◎ &nbsp; Remote work visa</button></div>
+  <div class="explorer-grid">
+    <aside id="filter-panel" class="filter-panel" aria-label="City filters"><div class="filter-title"><h3>Make it yours</h3><button id="reset" class="text-button">Reset all</button></div>
+      <form id="filters">
+        <label class="field">Region<select name="region" id="region"><option value="">Anywhere in the world</option></select></label>
+        <label class="field">Country or territory<select name="country" id="country"><option value="">All countries & territories</option></select></label>
+        <fieldset><legend>YOUR COST OF LIVING</legend><label class="field">Living as<select name="profile"><option value="nomad">A nomad</option><option value="expat">An expat</option><option value="local">A local</option><option value="family">A family</option></select></label><label class="field">Maximum monthly cost <span class="input-unit"><span>$</span><input name="budget" type="number" min="0" step="100" placeholder="Any budget" inputmode="numeric"><span>USD</span></span></label><p class="field-help">Source estimates for each living style. Rent is shown separately in city details.</p></fieldset>
+        <fieldset><legend>THE EVERYDAY ESSENTIALS</legend><label class="field">Internet speed<select name="internet"><option value="">Any connection</option><option value="10">10+ Mbps</option><option value="25">25+ Mbps</option><option value="50">50+ Mbps</option><option value="100">100+ Mbps</option></select></label><label class="field">Safety score<select name="safety"><option value="">Any score</option><option value="3">3+ / 5</option><option value="4">4+ / 5</option><option value="4.5">4.5+ / 5</option></select></label><label class="checkbox"><input type="checkbox" name="visa"><span>Remote work visa reported</span></label></fieldset>
+        <details><summary>Lifestyle & inclusion <span>+</span></summary><div id="lifestyle-filters"></div></details>
+        <details><summary>Weather snapshot <span>+</span></summary><p class="field-help">Conditions when collected, not a climate average or current forecast.</p><div class="field-pair"><label class="field">Min °C<input name="tempMin" type="number" placeholder="Any"></label><label class="field">Max °C<input name="tempMax" type="number" placeholder="Any"></label></div><label class="field">Maximum AQI<input name="air" type="number" min="0" placeholder="Any air quality"></label></details>
+      </form><p class="filter-footnote">Missing measurements are excluded only when you filter on that measurement.</p>
+    </aside>
+    <div class="results-panel">
+      <div class="search-row"><label class="search"><span aria-hidden="true">⌕</span><input id="search" type="search" placeholder="Search a city or country…" aria-label="Search a city or country"><span class="search-hint">EXPLORE</span></label><div class="view-switch" aria-label="Result layout"><button data-view="cards" aria-label="Card view" aria-pressed="true">▦</button><button data-view="table" aria-label="Table view" aria-pressed="false">☰</button></div></div>
+      <div id="active-filters" class="active-filters" aria-label="Active filters"></div>
+      <div class="result-toolbar"><p id="result-count" role="status">Finding your somewhere…</p><label>Sort by <select id="sort" aria-label="Sort cities"><option value="overall_score">Overall score</option><option value="cost">Lowest monthly cost</option><option value="internet_mbps">Fastest internet</option><option value="safety_score_0_to_5">Safety</option><option value="walkability_score_0_to_5">Walkability</option><option value="healthcare_score_0_to_5">Healthcare</option><option value="nightlife_score_0_to_5">Nightlife</option><option value="air_quality_now">Lowest snapshot AQI</option></select></label></div>
+      <div class="result-insights" id="result-insights"></div>
+      <div id="results" aria-busy="true"><div class="loading">Loading the atlas…</div></div>
+      <div class="results-bottom"><span id="page-count"></span><button id="more" class="secondary" hidden>Explore more cities <span>↓</span></button></div>
+      <div class="export-strip"><span><strong>Take your discoveries with you.</strong><br>Download all matching cities with every source field.</span><div><button id="export-json" class="text-button" disabled>Filtered JSON ↓</button><button id="export-csv" class="text-button" disabled>Filtered CSV ↓</button></div></div>
+    </div>
+  </div>
+</section>
+<section class="closing wrap"><span class="closing-star">✳</span><div><p class="eyebrow">A LITTLE PERSPECTIVE</p><h2>A city is more than its score.</h2><p>Use the data to find possibilities. Let the people, the streets,<br>and your own experience tell you the rest.</p></div><button class="secondary" id="data-notes">Read the data notes ↗</button></section>
+</main>
+<footer class="wrap"><a class="footer-brand" href="./">nomad atlas ↗</a><p>Independent explorer. City data credited to <a href="https://nomads.com/">Nomads.com</a>.<br>Saved estimates and source scores, not live conditions.</p><a href="./cities.json" download>Full dataset ↓</a></footer>
+<div id="compare-bar" class="compare-bar" hidden><div><span class="eyebrow">YOUR SHORTLIST</span><p id="compare-names"></p></div><button id="clear-compare" class="text-button">Clear</button><button id="open-compare" class="primary">Compare cities <span>↗</span></button></div>
+<dialog id="detail-dialog" aria-label="City details"><div class="dialog-top"><span>NOMAD ATLAS / CITY FIELD NOTES</span><button class="close-dialog" aria-label="Close city details">×</button></div><div id="detail-content"></div></dialog>
+<dialog id="compare-dialog" class="wide-dialog" aria-label="Compare cities"><div class="dialog-top"><span>YOUR PLACES, SIDE BY SIDE</span><button class="close-dialog" aria-label="Close comparison">×</button></div><h2>Your next chapter, compared.</h2><p class="muted">All values are from the saved Nomads.com snapshot. Scores are out of 5.</p><div id="comparison-content"></div></dialog>
+<dialog id="about-dialog" aria-label="About the data"><div class="dialog-top"><span>A NOTE ON THE NUMBERS</span><button class="close-dialog" aria-label="Close data notes">×</button></div><h2>Good data. Real context.</h2><p>This independent explorer uses 1,383 city records collected from <a href="https://nomads.com/">Nomads.com</a>. Credit for the source data belongs to Nomads.com.</p><h3>A snapshot, not a live feed</h3><p>Costs, visa flags and conditions may have changed. Temperature, humidity and air quality describe conditions at collection; they are not annual climate averages.</p><h3>Different ways of living</h3><p>Nomad, expat, local and family estimates are distinct fields supplied by the source. Rent and coworking are separate measurements; we do not add them to or subtract them from those estimates.</p><h3>Real places in the explorer</h3><p>The original 1,383-record download includes nine novelty entries in the source’s “Space” region. These are preserved in the original JSON and excluded from the explorer, leaving 1,374 terrestrial places.</p><h3>Missing data stays missing</h3><p>Unknown values are marked “Not available.” Filters exclude missing values only for the measurements you select. Source values are preserved, including unusual cost estimates; these are flagged for checking.</p><h3>Scores are a starting point</h3><p>Safety and inclusion ratings are source assessments, not guarantees. A reported remote work visa is a discovery signal; check the destination’s current requirements before making plans.</p><a class="primary" href="./cities.json" download>Download the original JSON ↓</a></dialog>
+<div id="toast" role="status" hidden></div>
+</body></html>

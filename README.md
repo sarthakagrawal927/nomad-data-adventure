@@ -1,37 +1,49 @@
-# Nomad Data Adventure
+# Nomad Atlas · Nomad Data Adventure
 
-A static city explorer covering 1,383 cities, hosted on GitHub Pages.
+A static city explorer hosted on Cloudflare Pages.
 
-Live product: https://sarthakagrawal927.github.io/nomad-data-adventure/
+Live: https://nomad-data-adventure.pages.dev/
 
-## Data and credits
+ The interface presents 1,374
+terrestrial places across 205 source country/territory labels. The original
+1,383-record JSON also preserves nine source novelty entries in the Space region.
 
-City data is sourced from [Nomads.com](https://nomads.com/). Credit belongs to
-Nomads.com for the source data. This is an independent explorer using a saved
-snapshot; values are not live prices or conditions.
+## Capabilities
 
-The full dataset is available at [cities.json](./cities.json) (about 1.35 MB).
-It is an unchanged copy of the collected `data/nomads_cities.json` snapshot.
-Attribution does not imply affiliation or a new license for the source data.
+- Search names and countries, including accent-insensitive matches.
+- Region and country filters; nomad, expat, local and family cost profiles.
+- Budget, internet, safety, visa, lifestyle, inclusion and snapshot weather filters.
+- Card and table views, sorting, pagination and shareable filter URLs.
+- Full city details and side-by-side comparison of up to three places across 22 metrics.
+- Original JSON download and filtered JSON/CSV exports with every source field.
 
-Search cities or countries, sort by cost, overall score, internet or safety,
-and filter by monthly budget. Missing values remain unavailable. Cities are
-shown in batches of 60, with a button to show more.
+## Data
 
-## Development
+City data is credited to [Nomads.com](https://nomads.com/). This independent
+explorer uses a saved snapshot, not live prices, visa information or conditions.
+The original `cities.json` remains byte-identical to `data/nomads_cities.json`.
+Unknown values stay missing. Unusual costs are flagged, not silently rewritten.
+The alternative local exports contain the same records, not additional datasets.
+
+## Development and checks
 
 ```sh
-python3 -m http.server 4173 --bind 127.0.0.1
+pnpm install --frozen-lockfile
+pnpm run dev
+pnpm run check
 ```
 
-Open <http://127.0.0.1:4173/>. The page fetches `cities.json` from the same site,
-so use an HTTP server rather than opening the HTML file directly.
+Open http://127.0.0.1:4173/. Runtime code is HTML, CSS and browser JavaScript.
+Wrangler is a development-only dependency for Cloudflare deployment.
 
-## Publishing
+## Cloudflare Pages deployment
 
-GitHub Pages serves the repository root on `main`. The public product consists
-of `index.html`, `cities.json`, and this README. There is no backend, database,
-build step, package manager, or external runtime service.
+`pnpm run build` copies an explicit public-file allowlist into `dist/` and fails
+if unexpected files are present. `data/`, logs, scripts and local dependencies
+are never uploaded. There are no Functions, Workers, APIs or databases.
 
-`data/` remains Git-ignored for local duplicate exports, collection scripts,
-state, and logs. Publish the root dataset, not the entire local data directory.
+After committing and pushing, wait for the exact commit's Static product checks
+workflow, then run `pnpm run deploy`. This runs checks, the Fleet deployment guard
+and `wrangler pages deploy dist --project-name nomad-data-adventure --branch main`.
+The project already exists on Pages, so Wrangler deploys directly to Pages.
+GitHub is used for source history and tests; production hosting is Cloudflare Pages.
