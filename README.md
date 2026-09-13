@@ -1,44 +1,37 @@
 # Nomad Data Adventure
 
-This is the single workspace folder for Nomad Data Adventure:
+A static city explorer covering 1,383 cities, hosted on GitHub Pages.
 
-- `index.html` — public static demo with three fictional city records.
-- `data/` — collected city datasets, collection scripts, and collection logs.
-  This directory is Git-ignored and is not part of the public repository or a
-  publication artifact.
+Live product: https://sarthakagrawal927.github.io/nomad-data-adventure/
 
-Live demo: https://sarthakagrawal927.github.io/nomad-data-adventure/
+## Data and credits
 
-## Run offline
+City data is sourced from [Nomads.com](https://nomads.com/). Credit belongs to
+Nomads.com for the source data. This is an independent explorer using a saved
+snapshot; values are not live prices or conditions.
 
-From this directory, use any static-file server:
+The full dataset is available at [cities.json](./cities.json) (about 1.35 MB).
+It is an unchanged copy of the collected `data/nomads_cities.json` snapshot.
+Attribution does not imply affiliation or a new license for the source data.
+
+Search cities or countries, sort by cost, overall score, internet or safety,
+and filter by monthly budget. Missing values remain unavailable. Cities are
+shown in batches of 60, with a button to show more.
+
+## Development
 
 ```sh
 python3 -m http.server 4173 --bind 127.0.0.1
 ```
 
-Open <http://127.0.0.1:4173/>. Use **Sort by** to compare overall score, cost,
-internet, or safety. Move **Maximum monthly estimate** to filter the shortlist.
-The page has no external font, image, script, stylesheet, or API request.
+Open <http://127.0.0.1:4173/>. The page fetches `cities.json` from the same site,
+so use an HTTP server rather than opening the HTML file directly.
 
-The files can also be opened directly as `index.html`, though a local server is
-the reproducible path used for verification.
+## Publishing
 
-## Collected data
+GitHub Pages serves the repository root on `main`. The public product consists
+of `index.html`, `cities.json`, and this README. There is no backend, database,
+build step, package manager, or external runtime service.
 
-The retained files include `data/nomads_cities.json`, compact JSON and JavaScript
-exports, the collection state and sitemap, and `data/cities-atlas.json` preserved
-from the former local app. Collection scripts and logs remain alongside the data.
-There is no separate local Astro app or local demo to maintain.
-
-## Rights boundary
-
-Every city and value in the root demo is fictional. The page makes no claim
-about real locations and contains no third-party dataset. The collected dataset
-in `data/` has no verified redistribution rights and remains local.
-
-## Publication allowlist
-
-Publish only the root `index.html` and this `README.md`. Never upload the entire
-workspace directory or `data/`. The public demo needs no build, package manager,
-external service, or deployment configuration.
+`data/` remains Git-ignored for local duplicate exports, collection scripts,
+state, and logs. Publish the root dataset, not the entire local data directory.

@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Nomad Data Adventure · Offline sample</title>
+  <title>Nomad Data Adventure · City explorer</title>
   <style>
     :root { color-scheme: light; --paper:#f5f1ea; --paper-2:#ede8de; --ink:#1c1b19; --ink-2:#4a4844; --ink-3:#76736c; --line:#d8d2c7; --teal:#0d5c5c; --teal-bg:#e0ecec; --ochre:#b8732e; --ochre-bg:#f4e8d8; --shadow:0 1px 3px rgba(28,27,25,.06); }
     * { box-sizing:border-box; }
@@ -17,6 +17,9 @@
     .lede { max-width:60ch; margin:0; color:var(--ink-2); font-size:16px; }
     .controls { display:flex; flex-wrap:wrap; align-items:end; gap:16px; margin:10px 0 24px; padding:16px; border:1px solid var(--line); border-radius:7px; background:#fff; box-shadow:var(--shadow); }
     label { display:grid; gap:5px; color:var(--ink-3); font-size:11px; font-weight:800; letter-spacing:.06em; text-transform:uppercase; }
+    button { cursor:pointer; min-height:40px; padding:9px 16px; border:1px solid var(--teal); border-radius:5px; background:var(--teal); color:white; font:inherit; }
+    a { color:var(--teal); }
+    #more { margin-top:20px; }
     select,input { min-height:38px; border:1px solid var(--line); border-radius:5px; padding:7px 10px; background:#fff; color:var(--ink); font:inherit; }
     input[type=range] { width:min(240px,55vw); padding:0; accent-color:var(--teal); }
     .budget-value { color:var(--teal); font:700 18px Georgia,"Times New Roman",serif; text-transform:none; letter-spacing:0; }
@@ -42,13 +45,17 @@
 </head>
 <body>
   <main class="shell">
-    <span class="badge">Offline sample · synthetic data</span>
+    <span class="badge">City data · by Nomads.com</span>
     <header>
       <p class="eyebrow">Nomad Data Adventure</p>
-      <h1>Compare a small city shortlist.</h1>
-      <p class="lede">A self-contained exploration demo with fictional records. Sort the trade-offs or set a monthly budget; no collected dataset or network request is involved.</p>
+      <h1>Find your next city.</h1>
+      <p class="lede">Explore 1,383 cities by monthly cost, internet speed and safety. Search for a place, compare the trade-offs, or download the full dataset.</p>
+      <p><a href="https://nomads.com/">City data by Nomads.com</a> · <a href="./cities.json" download>Download JSON · 1.35 MB</a></p>
     </header>
-    <section class="controls" aria-label="Sample controls">
+    <section class="controls" aria-label="City filters">
+      <label>Search cities or countries
+        <input id="search" type="search" placeholder="City or country" aria-label="Search cities or countries">
+      </label>
       <label>Sort by
         <select id="sort" aria-label="Sort cities">
           <option value="score">Overall score</option>
@@ -57,40 +64,93 @@
           <option value="safety">Highest safety</option>
         </select>
       </label>
-      <label>Maximum monthly estimate <span class="budget-value" id="budgetValue">$2,500</span>
-        <input id="budget" type="range" min="1200" max="2500" step="50" value="2500" aria-label="Maximum monthly estimate">
+      <label>Maximum monthly estimate <span class="budget-value" id="budgetValue">Any budget</span>
+        <input id="budget" type="range" min="0" max="15000" step="100" value="15000" aria-label="Maximum monthly estimate">
       </label>
       <span class="count" id="count" aria-live="polite"></span>
     </section>
-    <section id="cards" class="cards" aria-label="Sample city comparison"></section>
-    <section id="summary" class="summary" aria-label="Sample highlights"></section>
-    <footer><strong>Data note.</strong> Every city and value on this page is fictional and authored for this demo. It is not a claim about a real place and carries no third-party redistribution rights.</footer>
+    <section id="cards" class="cards" aria-label="City comparison" aria-busy="true"></section>
+    <section id="summary" class="summary" aria-label="City highlights"></section>
+    <button id="more" type="button" hidden>Show more cities</button>
+    <footer><strong>Data by <a href="https://nomads.com/">Nomads.com</a>.</strong> Credit to Nomads.com for the city data. This independent explorer uses a saved snapshot, not live prices or conditions. Missing values are shown as unavailable. <a href="./cities.json" download>Download the full JSON dataset</a>.</footer>
   </main>
   <script>
-    const cities = [
-      { name:'Aster Bay', country:'Luma', region:'Coast', cost:1450, internet:82, safety:4.6, score:4.4, note:'Fast connection and the lowest monthly estimate.' },
-      { name:'Juniper Ridge', country:'Northstar', region:'Highlands', cost:1820, internet:64, safety:4.9, score:4.5, note:'The strongest safety score in the sample.' },
-      { name:'Solport', country:'Maris', region:'Harbor', cost:2160, internet:96, safety:4.1, score:4.3, note:'The fastest connection for a higher monthly estimate.' }
-    ];
+    let cities = [];
+    let limit = 60;
     const cards = document.querySelector('#cards');
     const summary = document.querySelector('#summary');
     const sort = document.querySelector('#sort');
+    const search = document.querySelector('#search');
     const budget = document.querySelector('#budget');
     const budgetValue = document.querySelector('#budgetValue');
     const count = document.querySelector('#count');
-    const money = value => `$${value.toLocaleString()}`;
+    const more = document.querySelector('#more');
+    const money = value => new Intl.NumberFormat('en-US', { style:'currency', currency:'USD', maximumFractionDigits:0 }).format(value);
+    const known = value => typeof value === 'number' && Number.isFinite(value);
+    const escape = value => String(value ?? '').replace(/[&<>"']/g, character => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' })[character]);
+    const metric = (value, unit) => known(value) ? `${value.toLocaleString('en-US', { maximumFractionDigits:1 })}${unit}` : 'Unavailable';
     function render() {
       const max = Number(budget.value);
+      const anyBudget = max === Number(budget.max);
+      const query = search.value.trim().toLowerCase();
       const key = sort.value;
       const direction = key === 'cost' ? 1 : -1;
-      const visible = cities.filter(city => city.cost <= max).sort((a,b) => (a[key] - b[key]) * direction);
-      budgetValue.textContent = money(max);
-      count.textContent = `${visible.length} of ${cities.length} cities shown`;
-      cards.innerHTML = visible.length ? visible.map(city => `<article class="card"><div class="card-top"><div><p class="region">${city.region} · ${city.country}</p><h2>${city.name}</h2></div><span class="score">${city.score.toFixed(1)}</span></div><p class="note">${city.note}</p><dl><div><dt>Monthly estimate</dt><dd>${money(city.cost)}</dd></div><div><dt>Internet</dt><dd>${city.internet} Mbps</dd></div><div><dt>Safety</dt><dd>${city.safety.toFixed(1)} / 5</dd></div></dl></article>`).join('') : '<p class="empty">No fictional city fits this budget. Increase the maximum to see the sample again.</p>';
-      const highlights = visible.length ? [{ label:'Lowest estimate', city:visible.reduce((a,b) => a.cost < b.cost ? a : b), value:city => `${money(city.cost)} / month` }, { label:'Fastest internet', city:visible.reduce((a,b) => a.internet > b.internet ? a : b), value:city => `${city.internet} Mbps` }, { label:'Highest safety', city:visible.reduce((a,b) => a.safety > b.safety ? a : b), value:city => `${city.safety.toFixed(1)} / 5` }] : [];
-      summary.innerHTML = highlights.map(item => `<div><span>${item.label}</span><strong>${item.city.name}</strong><small>${item.value(item.city)}</small></div>`).join('');
+      const visible = cities.filter(city =>
+        (anyBudget || (known(city.cost) && city.cost <= max)) &&
+        `${city.name} ${city.country}`.toLowerCase().includes(query)
+      ).sort((a,b) => {
+        if (!known(a[key])) return known(b[key]) ? 1 : a.name.localeCompare(b.name);
+        if (!known(b[key])) return -1;
+        return (a[key] - b[key]) * direction || a.name.localeCompare(b.name);
+      });
+      const shown = visible.slice(0, limit);
+      budgetValue.textContent = anyBudget ? 'Any budget' : money(max);
+      count.textContent = `${shown.length.toLocaleString()} shown · ${visible.length.toLocaleString()} matching · ${cities.length.toLocaleString()} total`;
+      cards.innerHTML = shown.length ? shown.map(city => `<article class="card"><div class="card-top"><div><p class="region">${escape(city.region)} · ${escape(city.country)}</p><h2>${escape(city.name)}</h2></div><span class="score" title="Overall score out of 5">${known(city.score) ? city.score.toFixed(1) : '—'}</span></div><p class="note">${city.url ? `<a href="${escape(city.url)}">View on Nomads.com</a>` : 'Source: Nomads.com'}</p><dl><div><dt>Monthly estimate</dt><dd>${known(city.cost) ? money(city.cost) : 'Unavailable'}</dd></div><div><dt>Internet</dt><dd>${metric(city.internet, ' Mbps')}</dd></div><div><dt>Safety</dt><dd>${metric(city.safety, ' / 5')}</dd></div></dl></article>`).join('') : '<p class="empty">No cities match. Try another search or increase your budget.</p>';
+      const highlights = [
+        { label:'Lowest estimate', key:'cost', direction:1, value:city => `${money(city.cost)} / month` },
+        { label:'Fastest internet', key:'internet', direction:-1, value:city => metric(city.internet, ' Mbps') },
+        { label:'Highest safety', key:'safety', direction:-1, value:city => metric(city.safety, ' / 5') }
+      ].flatMap(item => {
+        const available = visible.filter(city => known(city[item.key]));
+        if (!available.length) return [];
+        const city = available.reduce((a,b) => (a[item.key] - b[item.key]) * item.direction <= 0 ? a : b);
+        return [{ ...item, city }];
+      });
+      summary.innerHTML = highlights.map(item => `<div><span>${item.label}</span><strong>${escape(item.city.name)}</strong><small>${item.value(item.city)}</small></div>`).join('');
+      more.hidden = shown.length >= visible.length;
     }
-    sort.addEventListener('change', render); budget.addEventListener('input', render); render();
+    function reset() { limit = 60; render(); }
+    sort.addEventListener('change', reset);
+    budget.addEventListener('input', reset);
+    search.addEventListener('input', reset);
+    more.addEventListener('click', () => { limit += 60; render(); });
+    async function loadCities() {
+      cards.innerHTML = '<p class="empty" role="status">Loading cities…</p>';
+      try {
+        const response = await fetch('./cities.json');
+        if (!response.ok) throw new Error(`Dataset request failed: ${response.status}`);
+        const data = await response.json();
+        if (!Array.isArray(data.cities) || !data.cities.length) throw new Error('Invalid city dataset');
+        cities = data.cities.map(city => {
+          let url = '';
+          try {
+            const source = new URL(city.url);
+            if (source.protocol === 'https:' && source.hostname === 'nomads.com') url = source.href;
+          } catch {}
+          return { name:String(city.name ?? ''), country:String(city.country ?? ''), region:String(city.region ?? ''), url,
+            cost:city.cost_for_nomad_usd_per_month, internet:city.internet_mbps,
+            safety:city.safety_score_0_to_5, score:city.overall_score };
+        });
+        render();
+      } catch {
+        cards.innerHTML = '<p class="empty" role="alert">The city dataset could not be loaded. Please refresh to retry, or <a href="./cities.json">open the JSON dataset</a>.</p>';
+        count.textContent = 'Dataset unavailable';
+      } finally {
+        cards.setAttribute('aria-busy', 'false');
+      }
+    }
+    loadCities();
   </script>
 </body>
 </html>
