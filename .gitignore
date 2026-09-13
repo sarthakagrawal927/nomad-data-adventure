@@ -1,0 +1,3 @@
+# Collected data, collection scripts, and logs stay local.
+# The public repository contains only the synthetic demo and its documentation.
+/data/

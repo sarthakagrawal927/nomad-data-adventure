@@ -1,9 +1,11 @@
-# Nomad Data Adventure · synthetic demo
+# Nomad Data Adventure
 
-This directory is the standalone, shareable demo for Nomad Data Adventure. It
-contains one static HTML file with three fictional city records, local CSS, and
-local JavaScript controls. It does not include the owner’s collected dataset,
-collection scripts, logs, credentials, or generated data.
+This is the single workspace folder for Nomad Data Adventure:
+
+- `index.html` — public static demo with three fictional city records.
+- `data/` — collected city datasets, collection scripts, and collection logs.
+  This directory is Git-ignored and is not part of the public repository or a
+  publication artifact.
 
 Live demo: https://sarthakagrawal927.github.io/nomad-data-adventure/
 
@@ -22,14 +24,21 @@ The page has no external font, image, script, stylesheet, or API request.
 The files can also be opened directly as `index.html`, though a local server is
 the reproducible path used for verification.
 
+## Collected data
+
+The retained files include `data/nomads_cities.json`, compact JSON and JavaScript
+exports, the collection state and sitemap, and `data/cities-atlas.json` preserved
+from the former local app. Collection scripts and logs remain alongside the data.
+There is no separate local Astro app or local demo to maintain.
+
 ## Rights boundary
 
-Every city and value is fictional and authored for this demo. The page makes no
-claim about real locations and contains no third-party dataset. The original
-Nomad Data Adventure checkout remains separate and private because its collected
-data has no verified redistribution rights.
+Every city and value in the root demo is fictional. The page makes no claim
+about real locations and contains no third-party dataset. The collected dataset
+in `data/` has no verified redistribution rights and remains local.
 
 ## Publication allowlist
 
-Publish only `index.html` and this `README.md` from this directory. No build,
-package manager, external service, or deployment configuration is required.
+Publish only the root `index.html` and this `README.md`. Never upload the entire
+workspace directory or `data/`. The public demo needs no build, package manager,
+external service, or deployment configuration.
