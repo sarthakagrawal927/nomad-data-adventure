@@ -1,8 +1,11 @@
 # Nomad Atlas · Nomad Data Adventure
 
+**Status: completed experiment · shareable.** The static explorer and saved
+dataset are the finished product. There is no active collection or expansion roadmap.
+
 A static city explorer hosted on Cloudflare Pages.
 
-Live: https://nomad-data-adventure.pages.dev/
+Live: https://nomad.significanthobbies.com/
 
  The interface presents 1,374
 terrestrial places across 205 source country/territory labels. The original
