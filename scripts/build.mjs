@@ -1,5 +1,5 @@
 import {mkdir,copyFile,readdir,stat} from 'node:fs/promises';
-const files=['index.html','style.css','app.js','model.js','favicon.svg','cities.json'];
+const files=['index.html','style.css','app.js','model.js','favicon.svg','cities.json','robots.txt','sitemap.xml'];
 await mkdir('dist',{recursive:true});
 const unexpected=(await readdir('dist')).filter(f=>!files.includes(f));
 if(unexpected.length)throw new Error(`Unexpected publication files: ${unexpected.join(', ')}`);
